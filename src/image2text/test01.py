@@ -1,11 +1,13 @@
+import os
 
 from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
 import torch
 from PIL import Image
 
-model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-feature_extractor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+mode_name = "/Users/liushihao/PycharmProjects/ai-research/model/nlpconnect/vit-gpt2-image-captioning"
+model = VisionEncoderDecoderModel.from_pretrained(mode_name)
+feature_extractor = ViTImageProcessor.from_pretrained(mode_name)
+tokenizer = AutoTokenizer.from_pretrained(mode_name)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
@@ -34,4 +36,15 @@ def predict_step(image_paths):
   return preds
 
 
-predict_step(['doctor.e16ba4e4.jpg']) # ['a woman in a hospital bed with a woman in a hospital bed']
+folder_path = "/Users/liushihao/PycharmProjects/ai-research/images"
+file_paths = []
+for filename in os.listdir(folder_path):
+    print(f'File Name: {filename}')
+    file_path = os.path.abspath(os.path.join(folder_path, filename))
+    file_paths.append(file_path)
+
+results = predict_step(file_paths)
+
+for image, text in zip(file_paths, results):
+    print(f'{image}: {text}')
+
